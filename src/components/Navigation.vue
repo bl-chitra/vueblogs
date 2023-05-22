@@ -1,0 +1,219 @@
+<template>
+  <header>
+    <nav>
+      <div class="branding">
+        <router-link class="header" :to="{ name: 'Home' }"
+          >VueBlogs</router-link
+        >
+      </div>
+
+      <div class="nav-links">
+        <ul>
+          <router-link class="link" :to="{ name: 'Home' }">Home</router-link>
+          <router-link class="link" :to="{ name: 'Blogs' }">Blogs</router-link>
+          <router-link
+            v-if="getCurrentUser"
+            class="link"
+            :to="{ name: 'CreatePost' }"
+            >Create Post</router-link
+          >
+        </ul>
+
+        <div
+          v-if="getCurrentUser"
+          @click="toggleProfileMenu"
+          class="profile"
+          ref="profile"
+        >
+          <span
+            ><h2>{{ getDisplayName[0] }}</h2></span
+          >
+          <div v-show="profileMenu" class="profile-menu">
+            <div class="info">
+              <div>
+                <h4>{{ getDisplayName }}</h4>
+                {{ getEmail }}
+              </div>
+            </div>
+            <div class="options">
+              <div class="option">
+                <v-btn class="ma-1" plain @click="signOut()" color="error">
+                  <v-icon class="mdi mdi-logout"></v-icon>
+                  &emsp; Log Out</v-btn
+                >
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </nav>
+  </header>
+</template>
+
+<script>
+import "firebase/compat/auth";
+
+import { mapActions, mapGetters } from "vuex";
+
+export default {
+  name: "navigation-vue",
+
+  data: () => ({
+    profileMenu: null,
+  }),
+
+  methods: {
+    ...mapActions("auth", ["signOut"]),
+
+    toggleProfileMenu(e) {
+      if (e.target === this.$refs.profile) {
+        this.profileMenu = !this.profileMenu;
+      }
+    },
+  },
+
+  computed: {
+    ...mapGetters("auth", ["getCurrentUser"]),
+    ...mapGetters("auth", ["getDisplayName"]),
+    ...mapGetters("auth", ["getEmail"]),
+  },
+};
+</script>
+
+<style lang="scss" scoped>
+header {
+  background-color: #000;
+  padding: 0 25px;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1),
+    0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  z-index: 99;
+
+  .link {
+    font-weight: 500;
+    padding: 0 8px;
+    transition: 0.3s color ease;
+
+    &:hover {
+      color: #1eb8b8;
+    }
+  }
+
+  nav {
+    display: flex;
+    padding: 25px 0;
+
+    .branding {
+      display: flex;
+      align-items: center;
+
+      .header {
+        font-weight: 600;
+        font-size: 24px;
+        color: #fff;
+        text-decoration: none;
+        &:hover {
+          color: #1eb8b8;
+        }
+      }
+    }
+    .nav-links {
+      position: relative;
+      display: flex;
+      flex: 1;
+      align-items: center;
+      justify-content: flex-end;
+
+      ul {
+        margin-right: 32px;
+
+        .link {
+          margin-right: 32px;
+        }
+
+        .link:last-child {
+          margin-right: 0;
+        }
+      }
+
+      .profile {
+        position: relative;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        color: #fff;
+        background-color: #303030;
+
+        span {
+          pointer-events: none;
+        }
+
+        .profile-menu {
+          position: absolute;
+          top: 60px;
+          right: 0;
+          width: 250px;
+          background-color: #303030;
+          box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1),
+            0 2px 4px -1px rgba(0, 0, 0, 0.06);
+
+          .info {
+            display: flex;
+            align-items: center;
+            padding: 15px;
+            border-bottom: 1px solid #fff;
+
+            .initials {
+              position: initial;
+              width: 40px;
+              height: 40px;
+              background-color: #fff;
+              color: #303030;
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              border-radius: 50%;
+            }
+
+            .right {
+              flex: 1;
+              margin-left: 24px;
+
+              p:nth-child(1) {
+                font-size: 14px;
+              }
+
+              p:nth-child(2),
+              p:nth-child(3) {
+                font-size: 12px;
+              }
+            }
+          }
+
+          .options {
+            padding: 15px;
+            .option {
+              text-decoration: none;
+              color: #fff;
+              display: flex;
+              align-items: center;
+
+              .icon {
+                width: 18px;
+                height: auto;
+              }
+              p {
+                font-size: 14px;
+                margin: 12px;
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
+</style>
